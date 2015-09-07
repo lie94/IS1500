@@ -27,4 +27,22 @@ till
     slt       $t1,$s0,$t0
     bne       $t1,$0,loop
 \end{verbatim}
+\section{Assignment 2}
+\subsection{Question 1}
+This is my code:
+\begin{verbatim}
+hexasc: 
+    andi    $v0, $a0, 15
+    slti    $t0, $v0, 10
+    beq     $t0, $0, bokst
+    addi    $v0, $v0, 0x30
+    jr      $ra
+bokst:	
+    #sub    $v0, $v0, 10
+    addi    $v0, $v0, 0x37
+    jr      $ra	
+\end{verbatim}
+\subsection{Question 2}
+\subsection{Question 3}
+The answer must be when the input is in the form of $16*n + 10 \subset N$
 \end{document}

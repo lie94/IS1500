@@ -27,7 +27,6 @@ hexasc:
 	addi 	$v0, $v0, 0x30
 	jr $ra
 bokst:	
-	#sub 	$v0, $v0, 10
 	addi 	$v0, $v0, 0x37
 	jr $ra
 	

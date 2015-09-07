@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2015.6.23)  7 SEP 2015 11:14
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2015.6.23)  7 SEP 2015 13:23
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -292,7 +292,7 @@ File: t1cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 Here is how much of TeX's memory you used:
  1088 strings out of 493304
  11918 string characters out of 6139871
- 66598 words of memory out of 5000000
+ 68598 words of memory out of 5000000
  4590 multiletter control sequences out of 15000+600000
  7799 words of font info for 20 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
@@ -306,7 +306,7 @@ sfonts/cm/cmsy10.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1200.pfb
 ></usr/share/texmf/fonts/type1/public/cm-super/sfbx1440.pfb></usr/share/texmf/f
 onts/type1/public/cm-super/sfrm1000.pfb></usr/share/texmf/fonts/type1/public/cm
 -super/sftt1000.pfb>
-Output written on "Lab 1.pdf" (1 page, 96259 bytes).
+Output written on "Lab 1.pdf" (1 page, 102241 bytes).
 PDF statistics:
  41 PDF objects out of 1000 (max. 8388607)
  29 compressed objects within 1 object stream

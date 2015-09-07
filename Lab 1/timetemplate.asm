@@ -71,6 +71,24 @@ tick:	lw	$t0,0($a0)	# get time
 tiend:	sw	$t0,0($a0)	# save updated result
 	jr	$ra		# return
 	nop
-
+delay:
+	jr $ra
+	nop
   # you can write your code for subroutine "hexasc" below this line
   #
+hexasc: 
+	andi 	$v0, $a0, 15
+	slti 	$t0, $v0, 10
+	beq 	$t0, $0, bokst
+	addi 	$v0, $v0, 0x30
+	jr $ra
+bokst:	
+	addi 	$v0, $v0, 0x37
+	jr $ra
+time2str:
+	add $t4, $a0, $0 	# Temporary save of a0 in t4
+	andi $t3,$a1,0xFFFF 	# The 16 least significant bits of $a1 is saved to $t3
+	add $a0, $t3, $0
+	jal haxasc
+	add $t5, $v0, $0
+	  
