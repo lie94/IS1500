@@ -43,6 +43,25 @@ bokst:
     jr      $ra	
 \end{verbatim}
 \subsection{Question 2}
+Kan visa om det behövs.
 \subsection{Question 3}
-The answer must be when the input is in the form of $16*n + 10 \subset N$
+The answer must be when the input is in the form of $16*n + 10 \subset N$ Det finns många värden som är möjliga. T.ex. resulterar värdena 10 och 26 i rätt resultat.
+\section{Assignment 3}
+\subsection{Fråga 1}
+time2string hade en adress där den skulle lagra informationen, istället för ett register. Detta underlättade då man behövde spara värden vid flera tillfällen. 
+\subsection{Fråga 2}
+Jag använde PUSH och POP för att försäkra mig om att värdena på \$s0 och \$s1 blev återställda till deras ursprungliga värde efter funktionen hade kört klart.
+\subsection{Fråga 3}
+Jag sparade värdet på första \$ra i ett annat, vanligt register, \$s2, och sedan återskapade jag det när det behövde det. Man hade också kunna använt PUSH och POP för att spara det i början för att sedan hämta det i slutet.
+\subsection{Fråga 4}
+Jag tror att det kommer förstöra koden då \emph{words} sparar saker med 4 register i taget. Kanske tillåter kompilatorn inte det på än gång. 
+\section{Assignment 4}
+\subsection{Fråga 1}
+Är värdet noll kommer koden bryta när den gör checken i whileloopen. Den kommer aldrig komma in i for loopen och väldigt kort tid går.
+\subsection{Fråga 2}
+Alla delar utav koden skulle ske. For loopen skulle loopas till sitt maxantal var 2 gånger innan indexet för whileloopen skulle vara lika med noll och loopen skulle lägga ner.
+\subsection{Fråga 3}
+Om inputten är ett negativ nummer kommer delay lägga av efter under 10 klockcyklar vilket tar $10^{-8}$ sekunder på en 1 GHz processor.
+\section{Assignment 6}
+
 \end{document}

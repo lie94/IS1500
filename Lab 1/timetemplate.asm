@@ -73,15 +73,30 @@ tiend:	sw	$t0,0($a0)	# save updated result
 	nop
 delay:
 	PUSH $ra
+	PUSH $s0
+	PUSH $s1
+whileLoop:	
 	slt $t0, $0, $a0
-	beq $t0, $0, whileLoop
+	beq $t0, $0, end
 	nop
-whileLoop:
 	addi $a0, $a0, -1
 	#Executing the following loop should take 1 ms
-	addi $t1, $0, 1   	# t1 = i
-	addi $t2, $0, 4711 	#  Max loops
+	addi $s0, $0, 1   	# t1 = i
+	addi $s1, $0, 4000 	#  Max loops
+	j forLoop
+	nop
+end: 
+	POP $s1
+	POP $s0
+	POP $ra
 	jr $ra
+	nop 
+forLoop:
+	slt $t0, $s0, $s1
+	addi $s0, $s0, 1
+	bne $t0, $0, forLoop
+	nop
+	j whileLoop
 	nop
   # you can write your code for subroutine "hexasc" below this line
   #
