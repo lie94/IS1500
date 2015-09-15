@@ -72,6 +72,15 @@ tiend:	sw	$t0,0($a0)	# save updated result
 	jr	$ra		# return
 	nop
 delay:
+	PUSH $ra
+	slt $t0, $0, $a0
+	beq $t0, $0, whileLoop
+	nop
+whileLoop:
+	addi $a0, $a0, -1
+	#Executing the following loop should take 1 ms
+	addi $t1, $0, 1   	# t1 = i
+	addi $t2, $0, 4711 	#  Max loops
 	jr $ra
 	nop
   # you can write your code for subroutine "hexasc" below this line
@@ -82,13 +91,50 @@ hexasc:
 	beq 	$t0, $0, bokst
 	addi 	$v0, $v0, 0x30
 	jr $ra
+	nop
 bokst:	
 	addi 	$v0, $v0, 0x37
 	jr $ra
-time2str:
-	add $t4, $a0, $0 	# Temporary save of a0 in t4
-	andi $t3,$a1,0xFFFF 	# The 16 least significant bits of $a1 is saved to $t3
-	add $a0, $t3, $0
-	jal haxasc
-	add $t5, $v0, $0
-	  
+	nop
+time2string:
+	PUSH $s1
+	PUSH $s2
+	add $s1, $a0, $0 	# Temporary save of a0 in t4
+	add $s2, $ra, $0	# Save ra:s value
+	add $a0, $a1, $0 
+	#Add first digit [s]
+	jal hexasc
+	nop
+	sb  $v0, 4($s1)
+	srl $a1, $a1, 4
+	add $a0, $a1, $0
+	#Add second digit [s]
+	jal hexasc
+	nop
+	sb  $v0, 3($s1)  
+	srl $a1, $a1, 4
+	add $a0, $a1, $0
+	#Add colon
+	add $t0, $0, 0x3a 
+	sb  $t0, 2($s1)
+	#Add third 	[m]
+	jal hexasc
+	nop
+	sb  $v0, 1($s1)  
+	srl $a1, $a1, 4
+	add $a0, $a1, $0
+	#Add fourth 	[m]
+	jal hexasc
+	nop
+	sb  $v0, 0($s1)  
+	srl $a1, $a1, 4
+	add $a0, $a1, $0
+	#Add null space
+	addi $t1, $0, 0x00
+	sb $t1, 5($s1)
+	#Set ra to it's previous value 
+	add $ra, $s2, $0
+	POP $s2
+	POP $s1
+	jr $ra
+	nop
