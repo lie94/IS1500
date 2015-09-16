@@ -114,9 +114,12 @@ bokst:
 time2string:
 	PUSH $s1
 	PUSH $s2
-	add $s1, $a0, $0 	# Temporary save of a0 in t4
+	add $s1, $a0, $0 	# Temporary save of a0 in s1
 	add $s2, $ra, $0	# Save ra:s value
 	add $a0, $a1, $0 
+	#Check if the first values are 00
+	jal isDING
+	nop
 	#Add first digit [s]
 	jal hexasc
 	nop
@@ -148,6 +151,27 @@ time2string:
 	addi $t1, $0, 0x00
 	sb $t1, 5($s1)
 	#Set ra to it's previous value 
+	add $ra, $s2, $0
+	POP $s2
+	POP $s1
+	jr $ra
+	nop
+isDING:
+	andi $t1, $a0, 0xff
+	beq $t1, $0, returnDING
+	nop
+	jr $ra
+	nop
+returnDING:
+	addi $t0, $0,  0x47
+	sb  $t0, 3($s1)
+	addi $t0, $0, 0x4e 
+	sb $t0 , 2($s1)
+	addi $t0, $0, 0x49
+	sb $t0 , 1($s1)
+	addi $t0, $0, 0x44 
+	sb $t0, 0($s1)
+	sb  $0, 4($s1)
 	add $ra, $s2, $0
 	POP $s2
 	POP $s1
