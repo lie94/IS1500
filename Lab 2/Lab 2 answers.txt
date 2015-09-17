@@ -1,0 +1,12 @@
+Assignment 2
+	Question 1
+		När en funktion inte ska returnera ett värde använder man void. Funktionen kan vara användbar genom att göra saker genom I/O eller genom att den ändrar på en global variabel.
+	Question 2
+		Jag använde mig av en global variabel column som beskrev vilken column funktionen var i, och resettade värdet till 1 när den slog över till värdet på COLUMBS.
+Assignment 3
+	Question 1
+		Jag använde en array av char:s i vilken jag sparade en 1 ifall det inte var en prime och en 0 ifall det var en prime. På detta sätt försäkrar jag mig om att array:en alltid använder sig av <n bytes, då char bara använder en byte.
+	Question 2
+		Huvudstegen i algoritmen är att gå igenom alla multiplar av tal. Man börjar med att säga att 2 är ett primtal, sedan markeras alla talen som är multiplar av 2 som icke-prim. Sedan markerar du 3 som prim och alla multiplar av 3 som icke-prim o.s.v.
+	Question 3
+		
