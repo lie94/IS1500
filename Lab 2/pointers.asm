@@ -32,10 +32,10 @@ stop:	j	stop
 # function work()
 work:
 	PUSH	($ra)
-	la 	$a0,text1
-	la	$a1,list1
-	la	$a2,count
-	jal	copycodes
+	la 	$a0,text1    # (&text1, &list1, count)	
+	la	$a1,list1	 # a0 = &text
+	la	$a2,count	 # a1 = &list
+	jal	copycodes    # a2 = &count
 	
 	la 	$a0,text2
 	la	$a1,list2
@@ -48,7 +48,7 @@ work:
 copycodes:
 loop:
 	lb	$t0,0($a0)	
-	sw	$t0,0($a1)
+	sw	$t0,0($a1)			
 	beq	$t0,$0,done
 
 	addi	$a0,$a0,1

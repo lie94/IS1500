@@ -1,3 +1,5 @@
+FELIX HEDENSTRÖM
+
 Assignment 2
 	Question 1
 		När en funktion inte ska returnera ett värde använder man void. Funktionen kan vara användbar genom att göra saker genom I/O eller genom att den ändrar på en global variabel.
@@ -19,3 +21,28 @@ Assignment 3
 		Anledningen till att jag har fått samma svar på alla tror jag inte beror på att metoderna för att beräkna prima är lika snabba, utan för att det som faktiskt tar tid är
 		själva printandet. Tidigare gjorde jag så att jag beräknade alla prima först, sedan printade jag dem. Detta är ett bättre mått på hastighet då för dessa låga tal är det printingen som tar mest utav
 		tiden. I de extratester jag gjorde såg det ut som om print-primes var klart snabbast för större tal.
+Assignment 4
+	Question 1
+		Jag skriver att funktionen ska ta in pekare i signaturen void copycodes(char *text, int *lst, int *count). För texten och listan behöver jag bara skicka in dem som vanligt, då de fungerar som pekare normalt. Men för countern så behöver jag skriva &counter för att den ska ta in den som en pekare.		
+	Question 2
+		När man inkrementerar en pointer räknar den upp värdet som den pekar på med lika många byte som den är stor, så för char är det en byte som den inkrementerar med, för int är det 2 bytes som den inkrementerar.
+	Question 3
+		Skillnaden är att när man inkrementerar det som pekaren pekar på ändras inte pekaren. Inkrementerar man pekaren kommer värdet den pekar på antagligen vara annorlunda, då om man kollar på *p så pekar den på en annan plats än vad den gjorde tidigare. När jag inkrementerade counter skickade jag först in den i funktionen som en pekare med hjälp av &counter, sedan ikrementerade jag den i funktioen genom att skriva *c = *c + 1;
+	Question 4
+		Jag "derefrence":ar pekare i bl.a. copycodes koden där jag skriver *c = *c + 1; och *lst = *text; när jag använder värdet som pekaren pekar på. I assembly motsvarar detta  att man skriver t.ex. 
+		lb	$t0,0($a0)
+		vilket betyder att vi laddar värdet som $a0 pekar på.
+	Question 5
+		Den datorn jag använder använder little-endian då jag får svaret 0x23,0x00,0x00,0x00, vilket betyder att värdet 35, som i hex är 00000023 om man sparar det på 4 bytes. Det skrivs istället baklänges, vilket betyder att det är little endian som används. Det känns som big endian är bättre för läslighet. Jag antar att big endian hjälper med multiplikation då när vi adderar två tal går vi baklänges och flyttar upp 10 om det blir över 10 ex:
+		Little-endian
+		   (100)
+			(10)
+			175
+		+	 36
+		-------
+			  1
+			 10	
+			200
+		-------
+			211
+		I big endian behöver man då inte leta fram vilken den sista siffran i ett tal är då man redan vet att den kommer vara på första index.
