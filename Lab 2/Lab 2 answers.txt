@@ -9,4 +9,9 @@ Assignment 3
 	Question 2
 		Huvudstegen i algoritmen är att gå igenom alla multiplar av tal. Man börjar med att säga att 2 är ett primtal, sedan markeras alla talen som är multiplar av 2 som icke-prim. Sedan markerar du 3 som prim och alla multiplar av 3 som icke-prim o.s.v.
 	Question 3
-		
+		+---------------+-------+--------+
+		| Programm		| 2 sek | 10 sek |
+		+---------------+-------+--------+
+		| Print-primes	|800000	| 5000000|
+		| Sieves		|800000	| 5000000|
+		| 

@@ -22,6 +22,7 @@ void print_sieves(int n){
 	}
 	for(i = 1; i < n - 1; i++){
 		if(!notPrime[i]){
+			print_number(i+1);
 			int number = i + 1;
 			int j = i + number;
 			while(j < n - 1){
@@ -31,14 +32,12 @@ void print_sieves(int n){
 		}
 		
 	}
-	for(i = 0; i < n - 1; i++){
+	/*for(i = 0; i < n - 1; i++){
 		if(!notPrime[i])
 			print_number(i+1);
-	}
+	}*/
 	printf("\n");
 } 
-
-
 
 int main(int argc, char *argv[]){
   	if(argc == 2)
