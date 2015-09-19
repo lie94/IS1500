@@ -14,4 +14,8 @@ Assignment 3
 		+---------------+-------+--------+
 		| Print-primes	|800000	| 5000000|
 		| Sieves		|800000	| 5000000|
-		| 
+		| Sieves-heap 	|800000 | 5000000|
+		+---------------+-------+--------+
+		Anledningen till att jag har fått samma svar på alla tror jag inte beror på att metoderna för att beräkna prima är lika snabba, utan för att det som faktiskt tar tid är
+		själva printandet. Tidigare gjorde jag så att jag beräknade alla prima först, sedan printade jag dem. Detta är ett bättre mått på hastighet då för dessa låga tal är det printingen som tar mest utav
+		tiden. I de extratester jag gjorde såg det ut som om print-primes var klart snabbast för större tal.

@@ -32,10 +32,6 @@ void print_sieves(int n){
 		}
 		
 	}
-	/*for(i = 0; i < n - 1; i++){
-		if(!notPrime[i])
-			print_number(i+1);
-	}*/
 	printf("\n");
 } 
 
