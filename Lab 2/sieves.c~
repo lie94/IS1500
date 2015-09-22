@@ -46,7 +46,7 @@ void print_sieves(int n){
 		}
 	}
 	printf("\n");
-	printf("StartPrimes: %d\n",startPrime + 1);
+	printf("StartPrimes: %d\n",startPrime);
 	printf("Primes: %d\n",primes);
 	printf("%f\n",total / primes);
 } 
