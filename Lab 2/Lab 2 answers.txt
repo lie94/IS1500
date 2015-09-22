@@ -46,3 +46,6 @@ Assignment 4
 		-------
 			211
 		I big endian behöver man då inte leta fram vilken den sista siffran i ett tal är då man redan vet att den kommer vara på första index.
+Assignment 5
+	Question 1
+		
