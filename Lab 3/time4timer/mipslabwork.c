@@ -16,7 +16,7 @@
 #include "mipslab.h"  /* Declatations for these labs */
 
 int mytime = 0x5957;
-int count;
+int timeoutcount;
 unsigned char binarytime = 0;
 volatile char * mPORTE = (volatile char * )0xbf886110; 
 char textstring[] = "text, more text, and even more text!";
@@ -41,21 +41,17 @@ void labinit( void ){
   	*mTRISD = *mTRISD | 0x0fe0; // Set bits 5-11 to input
 
     //Clock init
-    count = 0;
+    timeoutcount = 0;
     T2CONSET = 0x70;
     T2CONSET = 0x8000;
-    PR2 = (80000000 / 256 )/ 100;
+    PR2 = (80000000 / 256 )/ 10;
   	return;
 }
 
 int timer(void){
     if(IFS(0) & 0x100){
         IFS(0) = 0;
-        count++;
-    }
-    if(count >= 10){
-        T2CONSET = 0x8000;
-        count = 0;
+        timeoutcount++;
         return 1;
     }
     return 0;
@@ -81,11 +77,15 @@ void labwork( void )
 
   	} 
     if(timer()){
-      	time2string( textstring, mytime );
-      	display_string( 3, textstring );
-      	display_update();
-        tick( &mytime );
-        bintick(binarytime++);
+        if(timeoutcount >= 10){
+            time2string( textstring, mytime );
+            tick( &mytime );
+            display_string( 3, textstring );
+            display_update();
+            bintick(binarytime++);
+            T2CONSET = 0x8000;
+            timeoutcount = 0;
+        }
         display_image(96, icon);
     }
 

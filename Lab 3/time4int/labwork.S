@@ -18,6 +18,11 @@
 .text
 .global delay
 .global time2string 
+.global enable_interrupt
+enable_interrupt:
+	ei
+	jr $ra
+	nop
 delay:
 	PUSH $ra
 	PUSH $s0

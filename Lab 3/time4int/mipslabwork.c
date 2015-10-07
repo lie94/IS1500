@@ -17,7 +17,7 @@
 
 int prime = 1234567;
 int mytime = 0x5957;
-int count;
+int timeoutcount;
 unsigned char binarytime = 0;
 volatile char * mPORTE = (volatile char * )0xbf886110; 
 char textstring[] = "text, more text, and even more text!";
@@ -28,66 +28,51 @@ void bintick(char bin_time){
 }
 
 /* Interrupt Service Routine */
-void user_isr( void )
-{
-  return;
+void user_isr( void ){
+	IFS(0) = IFS(0) & 0xfeff;
+	if(timeoutcount++ >= 10){
+		timeoutcount = 0;
+		time2string(textstring, mytime);
+  		display_string(	3, textstring);
+  		display_update();
+  		tick(&mytime);
+	}
+  	return;
 }
 
 /* Lab-specific initialization goes here */
 void labinit( void ){
-	volatile char * mTRISE = (volatile char *) 0xbf886100;
+	/*volatile char * mTRISE = (volatile char *) 0xbf886100;
 	volatile short * mTRISD = (volatile short *) 0xbf8860C0;
 	
     *mTRISE = 0x00; 	// Set to 0 for output.
-  	*mTRISD = *mTRISD | 0x0fe0; // Set bits 5-11 to input
+  	*mTRISD = *mTRISD | 0x0fe0; // Set bits 5-11 to input*/
+    
+    //Interrupts init
+    enable_interrupt();
+    IEC(0) = IEC(0) | 0x100; // Tillåt  
+    IPC(2) = IPC(2) | 0x10;
 
     //Clock init
-    count = 0;
+    timeoutcount = 0;
     T2CONSET = 0x70;
     T2CONSET = 0x8000;
-    PR2 = (80000000 / 256 )/ 100;
+    PR2 = (80000000 / 256 )/ 10;
+  	
   	return;
 }
 
 int timer(void){
     if(IFS(0) & 0x100){
         IFS(0) = 0;
-        count++;
-    }
-    if(count >= 10){
-        T2CONSET = 0x8000;
-        count = 0;
+        timeoutcount++;
         return 1;
     }
     return 0;
 }
 /* This function is called repetitively from the main program */
-void labwork( void )
-{
-  	//delay( 1000 );
-  	int btns = getbtns();
-  	if(btns){
-  		int sw = getsw();
-  		switch(btns){
-  			case 4:
-  				mytime = ((sw & 0xf) << 3*4) | (mytime & 0x0fff);	
-  				break;
-  			case 2:
-  				mytime = ((sw & 0xf) << 2*4) | (mytime & 0xf0ff);
-  				break;
-  			case 1:
-  				mytime = ((sw & 0xf) << 4) | (mytime & 0xff0f);
-  				break;
-  		}
-
-  	} 
-    if(timer()){
-      	time2string( textstring, mytime );
-      	display_string( 3, textstring );
-      	display_update();
-        tick( &mytime );
-        bintick(binarytime++);
-        display_image(96, icon);
-    }
-
+void labwork( void ){
+  	prime = nextprime(	prime	);
+  	display_string(0,itoaconv(prime));
+  	display_update();
 }
