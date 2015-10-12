@@ -48,18 +48,15 @@ void labwork( void )
   	int btns = getbtns();
   	if(btns){
   		int sw = getsw();
-  		switch(btns){
-  			case 4:
-  				mytime = ((sw & 0xf) << 3*4) | (mytime & 0x0fff);	
-  				break;
-  			case 2:
-  				mytime = ((sw & 0xf) << 2*4) | (mytime & 0xf0ff);
-  				break;
-  			case 1:
-  				mytime = ((sw & 0xf) << 4) | (mytime & 0xff0f);
-  				break;
-  		}
-
+  		if(btns & 0x4){
+         mytime = ((sw & 0xf) << 3*4) | (mytime & 0x0fff);    
+      }
+      if(btns & 0x2){
+         mytime = ((sw & 0xf) << 2*4) | (mytime & 0xf0ff);
+      }
+      if(btns & 0x1){
+         mytime = ((sw & 0xf) << 4) | (mytime & 0xff0f);
+      }
   	} 
   	time2string( textstring, mytime );
   	display_string( 3, textstring );

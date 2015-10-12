@@ -1,4 +1,4 @@
-/* mipslabwork.c
+/*333 mipslabwork.c
 
    This file written 2015 by F Lundevall
 
@@ -50,14 +50,14 @@ void labinit( void ){
     
     //Interrupts init
     enable_interrupt();
-    IEC(0) = IEC(0) | 0x100; // Tillåt  
+    IEC(0) = /*IEC(0) |*/ 0x100; // Tillåt  
     IPC(2) = IPC(2) | 0x10;
 
     //Clock init
     timeoutcount = 0;
     T2CONSET = 0x70;
     T2CONSET = 0x8000;
-    PR2 = (80000000 / 256 )/ 10;
+    PR2 = ((80000000 / 256 )/ 10) * 2;
   	
   	return;
 }
