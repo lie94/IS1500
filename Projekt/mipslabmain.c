@@ -48,7 +48,9 @@ int main(void) {
 	SPI2CONSET = 0x8000;
 	
 	display_init();
-	
+	display_update();
+
+
 	labinit(); /* Do any lab-specific initialization */
 	char currentScreen = 0;
 	char hasUpdated = 0;
