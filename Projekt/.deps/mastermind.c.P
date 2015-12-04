@@ -1,0 +1,2 @@
+mastermind.c.o: mastermind.c sidefuncs.c
+mastermind.c sidefuncs.c :

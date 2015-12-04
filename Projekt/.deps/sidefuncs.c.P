@@ -1,0 +1,2 @@
+sidefuncs.c.o: sidefuncs.c
+sidefuncs.c :
