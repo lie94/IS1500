@@ -52,11 +52,6 @@ int main(void) {
 
 
 	labinit(); /* Do any lab-specific initialization */
-	char currentScreen = 0;
-	char hasUpdated = 0;
-	while( 1 )
-	{
-	  mastermind(&currentScreen, &hasUpdated); /* Do lab-specific things again and again */
-	}
+	mastermind(); /* Do lab-specific things again and again */
 	return 0;
 }

@@ -16,10 +16,7 @@
 #include "mipslab.h"  /* Declatations for these labs */
 #include "sidefuncs.h"
 
-int guess_nr = 1;
-
-char iter = 0;
-int changeScreen = 0;
+volatile char * mPORTE = (volatile char * )0xbf886110; 
 
 const unsigned int  START_SCREEN = 0, 
                     GUESS_SCREEN = 1, 
@@ -31,10 +28,44 @@ const unsigned int  START_SCREEN = 0,
 
 const unsigned int MAX_GUESSES = 6;
 
+char symbols [] = {35,36, 43,45, 33,63,0}; // #$+-!?
+
+char arrow = 62;
+
+struct Guess {
+    int * sequence;
+    int * answer;
+};
+
+
+
+
+
+
+
 unsigned int timeoutcount;
 
-volatile char * mPORTE = (volatile char * )0xbf886110; 
 
+
+void createString(char * res, const int symbol_index, int * guesses){
+    int i = 0;
+    while(res[i] != 0){
+        i++;
+    }
+    int j;
+    for(j = 0; j < 4; j++){
+        if(j == symbol_index){
+            res[i] = arrow;
+            i++;
+        }else{
+            res[i] = 32;
+            i++;
+        }
+        res[i] =  symbols[guesses[i]];
+        res[++i] = 32;
+        i++;
+    }
+}
 
 void bintick(char bin_time){
     (*mPORTE) = bin_time;
@@ -71,17 +102,19 @@ int timer(void){
     return 0;
 }
 
-void updateScreen(unsigned int currentScreen){
+void updateScreen(unsigned int currentScreen, int * guess_nr, int * current_guess, const int symbol_index){
     if(currentScreen == START_SCREEN){
         display_string(0,"  ");
         display_string(1,"  Welcome to");
         display_string(2,"  MASTERMIND");
         display_string(3,"  ");
     }else if(currentScreen == GUESS_SCREEN){   
-        char guess [16]= "Guess nr: ";
-        concatenate(guess, 16, guess_nr); 
-        display_string(0, guess);
-        display_string(1,"  ");
+        char guess [16] = "Guess nr: ";
+        concatenate(guess, 16, *guess_nr); 
+        display_string(0, guess); 
+        char input [16] = "   ";
+        createString(input, symbol_index, current_guess); 
+        display_string(1, input);
         display_string(2,"  ");
         display_string(3,"  ");
     }else if(currentScreen == LOSE_SCREEN){
@@ -93,38 +126,38 @@ void updateScreen(unsigned int currentScreen){
     display_update();
 }
 
-int lastBtns = 0;
 /**
  * Returns 1 if the button was pressed last cycle but is not pressed
  * this cycle. Ergo the button was released
  */
-char buttonPressed(int buttonNr, int buttons){
+char buttonPressed(int buttonNr, int buttons, int * lastBtns){
     int temp = powerTo(2,buttonNr - 1);
 
-    if( (temp & lastBtns) && ((buttons & temp) == 0) )                                                                                                                                                                                                                //if(    (((temp & ~(buttons)) & (lastBtns & temp)) == temp)                    && lastBtns)
+    if( (temp & *lastBtns) && ((buttons & temp) == 0) )                                                                                                                                                                                                                //if(    (((temp & ~(buttons)) & (lastBtns & temp)) == temp)                    && lastBtns)
         return 1; 
     return 0;
 }
 
-void usebtns(char * currentScreen){
+void usebtns(const char currentScreen, char * changeScreen, char * iter, int * lastBtns, int * guess_nr){
     int btns = getbtns();
-    if(*currentScreen == START_SCREEN){
-        if(buttonPressed(1,btns)){ //(btns & 0x8){
-            changeScreen = 1;
+    if(currentScreen == START_SCREEN){
+        if(buttonPressed(1,btns, lastBtns)){ //(btns & 0x8){
+            *changeScreen = 1;
         }
-    }else if(*currentScreen == GUESS_SCREEN){
-        if(buttonPressed(1,btns)){
-            iter = 1;
+    }else if(currentScreen == GUESS_SCREEN){
+        if(buttonPressed(1,btns, lastBtns)){
+            *iter = 1;
         }
-    }else if(*currentScreen == LOSE_SCREEN){
-        if(buttonPressed(1,btns)){
-            changeScreen = 0;
-            guess_nr = 1; // To adjust for screen update
-            iter = 0;
+    }else if(currentScreen == LOSE_SCREEN){
+        if(buttonPressed(1,btns, lastBtns)){
+            *changeScreen = 0;
+            *guess_nr = 1; // To adjust for screen update
+            *iter = 0;
         }
     }
-    lastBtns = btns;
+    *lastBtns = btns;
 }
+
 
 
 /* This function is called repetitively from the main program */
@@ -132,23 +165,36 @@ void usebtns(char * currentScreen){
  * There will be several types of pictures that will be displayed.
  * 
  */
-void mastermind( char * currentScreen)
+void mastermind(void)
 {   
-    if(timer() && 5 > timeoutcount){
-        if(iter){
-            guess_nr++;
-            iter = 0;
-            if(guess_nr > MAX_GUESSES){
-                changeScreen = LOSE_SCREEN;
-            }   
-            updateScreen(*currentScreen);
+    char currentScreen = 0;
+    char changeScreen = 0;
+    char iter = 0;
+    int lastBtns = 0;
+    int guess_nr = 1;
+    int current_guess [4]  = {0,0,1,0};
+
+    int symbol_index = 1;
+    while(1){
+        
+
+
+        if(timer() && 5 > timeoutcount){
+            if(iter){
+                guess_nr++;
+                iter = 0;
+                if(guess_nr > MAX_GUESSES){
+                    changeScreen = LOSE_SCREEN;
+                }   
+                updateScreen(currentScreen, &guess_nr, current_guess, symbol_index);
+            }
+            if(changeScreen != -1){
+                currentScreen = changeScreen;
+                changeScreen = -1;
+                updateScreen(currentScreen, &guess_nr, current_guess, symbol_index);
+            }
+            timeoutcount = 0;
         }
-        if(changeScreen != -1){
-            *currentScreen = changeScreen;
-            changeScreen = -1;
-            updateScreen(*currentScreen);
-        }
-        timeoutcount = 0;
+        usebtns(currentScreen,&changeScreen,&iter, &lastBtns, &guess_nr);
     }
-    usebtns(currentScreen);
 }
