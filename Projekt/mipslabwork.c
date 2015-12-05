@@ -28,9 +28,9 @@ const unsigned int  START_SCREEN = 0,
 
 const unsigned int MAX_GUESSES = 6;
 
-char symbols [] = {35,36, 43,45, 33,63,0}; // #$+-!?
+char SYMBOLS [] = {35,36, 43,45, 33,63,0}; // #$+-!?
 
-char arrow = 62;
+char ARROW = 62;
 
 struct Guess {
     int * sequence;
@@ -49,21 +49,16 @@ unsigned int timeoutcount;
 
 void createString(char * res, const int symbol_index, int * guesses){
     int i = 0;
-    while(res[i] != 0){
+    while(res[i] != 0 && i < 16)    
         i++;
-    }
     int j;
     for(j = 0; j < 4; j++){
         if(j == symbol_index){
-            res[i] = arrow;
-            i++;
+            res[i++] = ARROW;
         }else{
-            res[i] = 32;
-            i++;
+            res[i++] = 32;
         }
-        res[i] =  symbols[guesses[i]];
-        res[++i] = 32;
-        i++;
+        res[i++] = SYMBOLS[guesses[j]];
     }
 }
 
@@ -102,25 +97,25 @@ int timer(void){
     return 0;
 }
 
-void updateScreen(unsigned int currentScreen, int * guess_nr, int * current_guess, const int symbol_index){
+void updateScreen(const unsigned int currentScreen, const int guess_nr, int * current_guess, int symbol_index){
     if(currentScreen == START_SCREEN){
-        display_string(0,"  ");
-        display_string(1,"  Welcome to");
-        display_string(2,"  MASTERMIND");
-        display_string(3,"  ");
+        display_string(0,"\t");
+        display_string(1,"\tWelcome to");
+        display_string(2,"\tMASTERMIND");
+        display_string(3,"\t");
     }else if(currentScreen == GUESS_SCREEN){   
         char guess [16] = "Guess nr: ";
-        concatenate(guess, 16, *guess_nr); 
+        concatenate(guess, 16, guess_nr); 
         display_string(0, guess); 
-        char input [16] = "   ";
+        char input [16] = "\t";
         createString(input, symbol_index, current_guess); 
         display_string(1, input);
-        display_string(2,"  ");
-        display_string(3,"  ");
+        display_string(2,"\t");
+        display_string(3,"\t");
     }else if(currentScreen == LOSE_SCREEN){
-        display_string(0,"  GAME OVER");
+        display_string(0,"\tGAME OVER");
         display_string(1,"Right answer:");
-        display_string(2,"  //TODO");
+        display_string(2,"\t//TODO");
         display_string(3,"");
     }
     display_update();
@@ -138,7 +133,7 @@ char buttonPressed(int buttonNr, int buttons, int * lastBtns){
     return 0;
 }
 
-void usebtns(const char currentScreen, char * changeScreen, char * iter, int * lastBtns, int * guess_nr){
+void usebtns(const char currentScreen, char * changeScreen, char * iter, int * lastBtns, int * guess_nr, int * current_guess, char * change_index){
     int btns = getbtns();
     if(currentScreen == START_SCREEN){
         if(buttonPressed(1,btns, lastBtns)){ //(btns & 0x8){
@@ -147,6 +142,10 @@ void usebtns(const char currentScreen, char * changeScreen, char * iter, int * l
     }else if(currentScreen == GUESS_SCREEN){
         if(buttonPressed(1,btns, lastBtns)){
             *iter = 1;
+        }else if(buttonPressed(4,btns, lastBtns)){
+            *change_index = -1;
+        }else if(buttonPressed(3,btns, lastBtns)){
+            *change_index = 1;
         }
     }else if(currentScreen == LOSE_SCREEN){
         if(buttonPressed(1,btns, lastBtns)){
@@ -175,26 +174,42 @@ void mastermind(void)
     int current_guess [4]  = {0,0,1,0};
 
     int symbol_index = 1;
+    char change_index = 0;
     while(1){
         
 
+        if(1 < timeoutcount){ // LED SKA LYSA
+            bintick(3);
+        }else{              // LED SKA INTE LYSA
+            bintick(1);
+        }
 
-        if(timer() && 5 > timeoutcount){
+        if(timer() && 2 < timeoutcount){
             if(iter){
                 guess_nr++;
                 iter = 0;
                 if(guess_nr > MAX_GUESSES){
                     changeScreen = LOSE_SCREEN;
                 }   
-                updateScreen(currentScreen, &guess_nr, current_guess, symbol_index);
+                updateScreen(currentScreen, guess_nr, current_guess, symbol_index);
+            }
+            if(change_index){
+                symbol_index += change_index;
+                if(symbol_index < 0){
+                    symbol_index = 3;
+                }else if(symbol_index > 3){
+                    symbol_index = 0;
+                }
+                change_index = 0;
+                updateScreen(currentScreen, guess_nr, current_guess, symbol_index);
             }
             if(changeScreen != -1){
                 currentScreen = changeScreen;
                 changeScreen = -1;
-                updateScreen(currentScreen, &guess_nr, current_guess, symbol_index);
+                updateScreen(currentScreen, guess_nr, current_guess, symbol_index);
             }
             timeoutcount = 0;
         }
-        usebtns(currentScreen,&changeScreen,&iter, &lastBtns, &guess_nr);
+        usebtns(currentScreen,&changeScreen,&iter, &lastBtns, &guess_nr, current_guess, &change_index);
     }
 }
