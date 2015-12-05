@@ -19,7 +19,14 @@
 int guess_nr = 1;
 char iter = 0;
 
-const unsigned int START_SCREEN = 0, GUESS_SCREEN = 1, LOSE_SCREEN = 2;
+const unsigned int  START_SCREEN = 0, 
+                    GUESS_SCREEN = 1, 
+                    LOSE_SCREEN = 2,
+                    PAST_GUESS = 3,
+                    WRONG_SCREEN = 4,
+                    INVALID_SCREEN = 5,
+                    WIN_SCREEN = 6;
+
 const unsigned int MAX_GUESSES = 6;
 
 
@@ -125,7 +132,7 @@ void mastermind( char * currentScreen, char * hasUpdated)
             *hasUpdated = 0;
             if(guess_nr > MAX_GUESSES){
                 *currentScreen = LOSE_SCREEN;
-            }
+            }   
         }
         updateScreen(hasUpdated, *currentScreen);
         timeoutcount = 0;
