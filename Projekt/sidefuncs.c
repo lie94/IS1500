@@ -27,6 +27,20 @@ void zeroInit(int * array, int length){
 }
 
 /**
+ * returns base ^ tothepower
+ */
+int powerTo(int base, int tothepower){
+    int res =	 1;
+    int i;
+    for(i = 0; i < tothepower; i++){
+        res *= base;
+    }
+    return res;
+}
+
+
+
+/**
  * Generates a random array.
  * min and max dictates the minimal and maximum value each element in the array can have
  */

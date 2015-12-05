@@ -15,6 +15,11 @@ void copyArray(int * copyFrom, int * copyTo, int length);
 void zeroInit(int * array, int length);
 
 /**
+ * returns base ^ tothepower
+ */
+int powerTo(int base, int tothepower);
+
+/**
  * Generates a random array.
  * min and max dictates the minimal and maximum value each element in the array can have
  */
