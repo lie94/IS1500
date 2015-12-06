@@ -214,6 +214,7 @@ void updateScreen(const unsigned int currentScreen, const int guess_nr, int * cu
         display_string(2,input);
         display_string(3,"\tPLAY AGAIN?");
     }
+
     display_update();
 }
 
@@ -279,6 +280,7 @@ void usebtns(const char currentScreen, int * lastBtns, int * dataArray){
             dataArray[ITER_INCREASE] = TRUE;
             dataArray[UPDATE_SCREEN] = GUESS_SCREEN;       
             dataArray[REMOVE_BLINKS] = TRUE;
+
         }
     }
     //if(SWITCHARNA ÄR IGÅNG OCH VI INTE ÄR VISSA SKÄRMAR)
@@ -303,52 +305,77 @@ void reset(int * dataArray, int * symbol_index, int * current_guess, int * guess
  * Number 1 means that there is a correctly positioned symbol
  * Number 2 means that there is a symbol that belongs in the sequence
  */
-void setData(int * guess_info, int data){
+/*void setData(int * guess_info, int data){
     int i = 0;
     while(guess_info[i] != 0)
         i++;
     guess_info[i] = data;
-}   
+}  */ 
 
 
-void checkPartialMatch(int * guesses, int * valid_sequence, int * guess_info){
+int checkPartialMatch(int * guesses, int * valid_sequence){
+    int temp = 0;
     int i,j;
     for(i = 0; i < 4; i++){
         for(j = 0; j < 4; j++){
             if(guesses[i] == valid_sequence[j]){
                 valid_sequence[j]   = -2;
                 guesses[i]          = -1;
-                setData(guess_info,2);
+                temp++;
+                //setData(guess_info,2);
             }
         }
     }
+    return temp;
 }
 
-void checkTotalMatches(int * guesses, int * valid_sequence, int * guess_info){
+int checkTotalMatches(int * guesses, int * valid_sequence){
+    int temp = 0;
     int i;
     for(i = 0; i < 4; i++){
         if(guesses[i] == valid_sequence[i]){
             guesses[i]          = -1;
             valid_sequence[i]   = -2;
-            setData(guess_info,1);
+            temp++;
+            //setData(guess_info,1);
         }
     }
+    return temp;
 }
 
 /**
  * 
  */
 void createBlinks(int * current_guess, int * right_answer, int * current_lit, int * current_blink ){
-    int * copy_guess;
-    int * copy_answer;
-    int game_answer[4];
-    zeroInit(game_answer,4);
+    int copy_guess [4];
+    int copy_answer [4];
+    int temp1, temp2;
+    //zeroInit(game_answer,4);
     copyArray(current_guess, copy_guess, 4);
-    copyArray(right_answer, copy_answer, 4);   
-    checkTotalMatches(copy_guess, copy_answer, game_answer);
-    checkPartialMatch(copy_guess, copy_answer, game_answer);
-    *current_lit    = 11;
-    *current_blink  = 10;
+    copyArray(right_answer, copy_answer, 4);
+    *current_lit    = 0;
+    *current_blink  = 0;
+    temp1 = checkTotalMatches(copy_guess, copy_answer);
+    temp2 = checkPartialMatch(copy_guess, copy_answer);
+    if (temp1 == 1)
+        *current_lit = 0x80;
+    else if (temp1 == 2)
+        *current_lit = 0xc0;
+    else if (temp1 == 3)
+        *current_lit = 0xe0;
+    else if (temp1 ==4)
+        *current_lit = 0xf0;
+    temp2 += temp1;
+    if (temp2 == 1)
+        *current_blink = 0x80;
+    else if (temp2 == 2)
+        *current_blink = 0xc0;
+    else if (temp2 == 3)
+        *current_blink = 0xe0;
+    else if (temp2 == 4)
+        *current_blink = 0xf0;
+    //*current_lit    = 11;
+    //*current_blink  = 10;
 }
 
 void mastermind(void)
@@ -363,7 +390,6 @@ void mastermind(void)
 
     int symbol_index;
 
-
     int rightAnswer [4];
 
     //int past_guesses [MAX_GUESSES][4];
@@ -375,8 +401,10 @@ void mastermind(void)
     while(TRUE){
         if(1 < timeoutcount){ // LED SKA LYSA
             bintick(currentLit);
+        
         }else{              // LED SKA INTE LYSA
             bintick(currentBlink);
+        
         }
 
         if(timer() && 2 < timeoutcount){
@@ -388,49 +416,50 @@ void mastermind(void)
                     dataArray[UPDATE_SCREEN] = LOSE_SCREEN;
                 
                 }else{
-                    /*int i;
-                    for(i = 0; i < 4; i++){
-                        past_guesses[guess_nr - 1][i] = current_guess[i];    
-                    }*/
                     dataArray[UPDATE_SCREEN] = WRONG_SCREEN;
                     createBlinks(current_guess, rightAnswer, &currentLit, &currentBlink);
                 }
-                //dataArray[CHECK_ANSWER] = FALSE;
+    
             }
             if(dataArray[REMOVE_BLINKS] == TRUE ){
                 currentLit = 0;
                 currentBlink = 0;
-                //dataArray[REMOVE_BLINKS] == FALSE;
+
             }
             if(dataArray[ITER_INCREASE] == TRUE){
                 guess_nr++;
-                //dataArray[ITER_INCREASE] = FALSE;
                 if(guess_nr > MAX_GUESSES){
                     dataArray[UPDATE_SCREEN] = LOSE_SCREEN;
+            
                 }   
+            
             }
             if(dataArray[RESET]){
                 reset(dataArray, &symbol_index, current_guess, &guess_nr, rightAnswer,sizeof(dataArray) / sizeof(int));
+            
             }
             if(dataArray[SYMBOL_INDEX_CHANGE] != FALSE){
                 symbol_index += dataArray[SYMBOL_INDEX_CHANGE];
                 if(symbol_index < 0){
                     symbol_index = 3;
+                
                 }else if(symbol_index > 3){
                     symbol_index = 0;
+                
                 }
-                //dataArray[SYMBOL_INDEX_CHANGE] = 0;
+            
             }
             if(dataArray[SYMBOL_INCREASE] == TRUE){
                 current_guess[symbol_index]++;
                 if(current_guess[symbol_index] > 5){
                     current_guess[symbol_index] = 0;
+                
                 }
-                //dataArray[SYMBOL_INCREASE] = 0;
+
             }
             if(dataArray[UPDATE_SCREEN] != -1){
                 currentScreen = dataArray[UPDATE_SCREEN];
-                //dataArray[UPDATE_SCREEN] = -1;
+            
             }
             updateScreen(currentScreen, guess_nr, current_guess, symbol_index, rightAnswer);
             zeroInit(dataArray, sizeof(dataArray) / sizeof(int));;
