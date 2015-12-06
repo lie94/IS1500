@@ -26,10 +26,6 @@ void zeroInit(int * array, int length){
 	}
 }
 
-
-
-
-
 /**
  * returns base ^ tothepower
  */
