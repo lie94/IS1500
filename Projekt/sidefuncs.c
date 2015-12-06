@@ -26,6 +26,10 @@ void zeroInit(int * array, int length){
 	}
 }
 
+
+
+
+
 /**
  * returns base ^ tothepower
  */
@@ -38,7 +42,18 @@ int powerTo(int base, int tothepower){
     return res;
 }
 
-
+/**
+ * Checks if two arrays are equal
+ * returns 1 if they are equal, 0 otherwise
+ */
+char equal(int * array1, int * array2,const int length){
+	int i;
+	for(i = 0; i < length; i++){
+		if(array1[i] != array2[i])
+			return 0;
+	}
+	return 1;
+}
 
 /**
  * Generates a random array.

@@ -19,7 +19,14 @@ void zeroInit(int * array, int length);
  */
 int powerTo(int base, int tothepower);
 
+
 /**
+ * Checks if two arrays are equal
+ * returns 1 if they are equal, 0 otherwise
+ */
+char equal(int * array1, int * array2,const int length);
+
+/*
  * Generates a random array.
  * min and max dictates the minimal and maximum value each element in the array can have
  */

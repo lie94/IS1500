@@ -37,6 +37,10 @@ void setData(int * guess_info, int data){
 	guess_info[i] = data;
 
 }	
+
+
+
+
 void checkTotalMatches(int * guesses, int * valid_sequence, int * guess_info){
 	int i;
 	for(i = 0; i < ARRAY_LENGTH; i++){
@@ -46,7 +50,8 @@ void checkTotalMatches(int * guesses, int * valid_sequence, int * guess_info){
 			setData(guess_info,1);
 		}
 	}
-} 
+}
+
 void checkPartialMatch(int * guesses, int * valid_sequence, int * guess_info){
 	int i,j;
 	for(i = 0; i < ARRAY_LENGTH; i++){
@@ -66,7 +71,7 @@ void checkPartialMatch(int * guesses, int * valid_sequence, int * guess_info){
 	//printf("\n");
 }*/
 
-/*int main(void) {
+int main(void) {
 	int i;
 	unsigned int valid_sequence [ARRAY_LENGTH];
 	generateSequence(valid_sequence,ARRAY_LENGTH,0,6);
@@ -114,4 +119,4 @@ void checkPartialMatch(int * guesses, int * valid_sequence, int * guess_info){
 		free(guess_info);
 	}	
    	return 0;
-}*/
+}
