@@ -31,5 +31,5 @@ char equal(int * array1, int * array2,const int length);
  * min and max dictates the minimal and maximum value each element in the array can have
  */
 //TODO
-void generateSequence(int * array, unsigned const int length, const int min,unsigned const int max);
+void generateSequence(int * array, unsigned const int length, const int min, unsigned const int max, unsigned const int random_seed);
 #endif

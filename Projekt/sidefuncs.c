@@ -1,4 +1,6 @@
 
+int distorter = 42;
+
 // Fungerar bara för siffor mindre än 10	
 void concatenate(char * string, const unsigned int string_length, const unsigned int number){
 	int i = 0;
@@ -56,8 +58,12 @@ char equal(int * array1, int * array2,const int length){
  * min and max dictates the minimal and maximum value each element in the array can have
  */
 //TODO
-void generateSequence(int * array, unsigned const int length, const int min,unsigned const int max){
+void generateSequence(int * array, unsigned const int length, const int min,unsigned const int max, unsigned const int random_seed){
 	int i;
-	for(i = 0; i < length; i++)
-		array[i] = i;
+	for(i = 0; i < length; i++){
+		int a = ((random_seed ^ 3) ^ 5) / 7;
+		int b = ((distorter ^ 11) - 13) ^ 17;
+		distorter = (a ^ b); 
+		array[i] = min + ((a + b) % (max - min));
+	}
 }

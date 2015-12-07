@@ -33,15 +33,10 @@ const unsigned int MAX_GUESSES = 6;
 
 char SYMBOLS [] = {35,36, 43,45, 33,63,0}; // #$+-!?
 
-char ARROW = 62;
-
-struct Guess {
-    int * sequence;
-    int * answer;
-};
+const char ARROW = 62;
 
 unsigned int timeoutcount;
-
+unsigned int randomSeed;
 
 /**
  * Creates a char array from the first 4 digits in the array and returns it.
@@ -56,7 +51,9 @@ void createSimpleString(int * array, char * input){
         input[i++] = SYMBOLS[array[j]];
     }
 }
-
+/**
+ * Creates a string with an arrow pointing to a symbol
+ */
 void createString(char * res, const int symbol_index, int * guesses){
     int i = 0;
     while(res[i] != 0 && i < 16)    
@@ -72,11 +69,11 @@ void createString(char * res, const int symbol_index, int * guesses){
     }
 }
 
-void bintick(char bin_time){
+void led_display(char bin_time){
     (*mPORTE) = bin_time;
 }
 
-/* Interrupt Service Routine */
+/* Legacy-code */
 void user_isr( void ){
   return;
 }
@@ -97,80 +94,27 @@ void labinit( void ){
     return;
 }
 
+
+/**
+ * Timer that controlls the screens refreshrate, the blinking of the leds and supplies
+ * a random seed for the sequence generator.
+ */
 int timer(void){
     if(IFS(0) & 0x100){
         IFS(0) = 0;
         timeoutcount++;
+        randomSeed = (randomSeed + 2) % 100;
         return 1;
     }
     return 0;
 }
 
+
 /**
-*This function determines wheter a given guess was right or wrong,
-*if correct the function returns 1, if it was not correct the function
-*stores information regarding how correct the guess was in two arrays
-*at an index corresponding to the current guess so that information regarding
-*this incorrect guess may be viewed at any time.
-*
-*TL;DR checks if a guess was correct, saves data on incorrect guesses.
-*
-*@param: current guess number, the current guess, array of normal led phases, array of blinking led phases, the current normal phase, the current blinking phase
-*
-*/
-/*int checkIfCorrect(int * guess_nr, int * rightAnswer, int * current_guess,int * old_guess_normal_led, int * old_guess_blinking_led, int * ledNormal, int * ledBlink){
-    int i,j;
-    //temp1/2 will represent how many LEDs will be lit up
-    //during the "blinking phase" and how many will allways be lit
-    int temp1 = 0;
-    int temp2 = 0;
-    for(i = 0;i<4;i++){
-        j=0;
-        while(j<4){
-            //Does the first character in the answer match any character in the guess
-            if(current_guess[j]==ANSWER[i]){
-                temp1++;
-                //Did the characters also have the same index
-                if(i == j){
-                    temp2++;
-                }
-                j=4;
-            }
-            j++;
-        }
-    }
-    //Set the LED phases
-
-    //Blink phase
-    if(temp1 == 0) 
-        *ledBlink = 0x0;
-    else if (temp1 == 1)
-        *ledBlink = 0x80;
-    else if (temp1 == 2)
-        *ledBlink = 0xc0;
-    else if (temp1 == 3)
-        *ledBlink = 0xe0;
-    else if (temp1 ==4)
-        *ledBlink = 0xf0;
-    //Normal phase
-        if(temp2 == 0) 
-        *ledNormal = 0x0;
-    else if (temp2 == 1)
-        *ledNormal = 0x80;
-    else if (temp2 == 2)
-        *ledNormal = 0xc0;
-    else if (temp2 == 3)
-        *ledNormal = 0xe0;
-    else if (temp2 == 4){
-        *ledNormal = 0xf0;
-        return 1;
-    }
-    old_guess_blinking_led[*guess_nr-1] = *ledBlink;
-    old_guess_normal_led[*guess_nr-1] = *ledNormal;
-    return 0;
-}*/
-
-void updateScreen(const unsigned int currentScreen, const int guess_nr, int * current_guess, int symbol_index, int * rightAnswer){
+ * Updates the screen with the information given from the mastermind loop. Is ONLY called from the mastermind loop
+ * Is not allowed to change the value from any of the inputs it is given, only allowed to display thing on the screen.
+ */
+void updateScreen(const unsigned int currentScreen, const int guess_nr, int * current_guess, const int symbol_index, int * rightAnswer, int * past_guess, const int past_guess_nr){
     if(currentScreen == START_SCREEN){
         display_string(0,"\t");
         display_string(1,"\tWELCOME TO");
@@ -197,9 +141,6 @@ void updateScreen(const unsigned int currentScreen, const int guess_nr, int * cu
         char input[16] = "\tYOU HAVE ";
         concatenate(input,16,MAX_GUESSES -guess_nr);
         display_string(1,input);
-        //char  = "\t\t\t\t";
-        //concatenate(input, 16, MAX_GUESSES - guess_nr);
-        //display_string(2,input);
         if(MAX_GUESSES - guess_nr == 1){
             display_string(2,"\tGUESS LEFT");
         }else{
@@ -213,6 +154,22 @@ void updateScreen(const unsigned int currentScreen, const int guess_nr, int * cu
         createSimpleString(rightAnswer, input);
         display_string(2,input);
         display_string(3,"\tPLAY AGAIN?");
+    }else if(currentScreen == PAST_GUESS){
+        char guess [16] = "\tGUESS NR: ";
+        concatenate(guess, 16, past_guess_nr); 
+        display_string(0, guess); 
+        char input [16] = "\t";
+        createSimpleString(past_guess,input); 
+        display_string(1, input);
+        display_string(2,"\t");
+        display_string(3,"\t");
+    }else if(currentScreen == INVALID_SCREEN){
+        display_string(0,"OBS! INVALID");
+        display_string(1,"SWITCH VALUE");
+        display_string(2,"MUST BE LOWER");
+        char input [16] = "THAN ";
+        concatenate(input,16, guess_nr);
+        display_string(3,input);
     }
 
     display_update();
@@ -237,6 +194,7 @@ const int SYMBOL_INDEX_CHANGE   = 3;
 const int RESET                 = 4;
 const int CHECK_ANSWER          = 5;
 const int REMOVE_BLINKS         = 6;
+const int GOTO_MAP              = 7;
 
 /**
  * Returns nessesary canges with dataArray:
@@ -246,6 +204,8 @@ const int REMOVE_BLINKS         = 6;
  * index3: symbol_index_change  : Change the index of the current symbol +/- 1
  * index4: reset                : reset all varialbes
  * index5: check_answer         : Check if the current answer is correct
+ * index6: remove_blinks        : Turns off the led display
+ * index7: goto_map             : Changes the display to a passed guess or to an invalid screen if the index is out of reach.
  */
 void usebtns(const char currentScreen, int * lastBtns, int * dataArray){
     int btns = getbtns();
@@ -283,6 +243,14 @@ void usebtns(const char currentScreen, int * lastBtns, int * dataArray){
 
         }
     }
+    // SWITCHES
+    if(getsw() && (currentScreen == GUESS_SCREEN || currentScreen == INVALID_SCREEN || currentScreen == PAST_GUESS)){
+        dataArray[GOTO_MAP] = getsw();
+
+    }else if(getsw() == 0 && (currentScreen == PAST_GUESS || currentScreen == INVALID_SCREEN)){
+        dataArray[UPDATE_SCREEN] = GUESS_SCREEN;        
+        dataArray[REMOVE_BLINKS] = TRUE;
+    }
     //if(SWITCHARNA ÄR IGÅNG OCH VI INTE ÄR VISSA SKÄRMAR)
     *lastBtns = btns;
 }
@@ -295,24 +263,13 @@ void reset(int * dataArray, int * symbol_index, int * current_guess, int * guess
     //dataArray[UPDATE_SCREEN] = 0;
     *symbol_index = 0;
     *guess_nr = 1;
-    generateSequence(rightAnswer, 4, 0, 6);
     zeroInit(current_guess, 4);
 }
 
 
-/*
- * Sets the type of right answer in guess_info.
- * Number 1 means that there is a correctly positioned symbol
- * Number 2 means that there is a symbol that belongs in the sequence
+/**
+ * Returns how many symbols are in the sequence but not at the right place.
  */
-/*void setData(int * guess_info, int data){
-    int i = 0;
-    while(guess_info[i] != 0)
-        i++;
-    guess_info[i] = data;
-}  */ 
-
-
 int checkPartialMatch(int * guesses, int * valid_sequence){
     int temp = 0;
     int i,j;
@@ -329,6 +286,9 @@ int checkPartialMatch(int * guesses, int * valid_sequence){
     return temp;
 }
 
+/**
+ * Returns the number of symbols that are in the right place
+ */ 
 int checkTotalMatches(int * guesses, int * valid_sequence){
     int temp = 0;
     int i;
@@ -374,8 +334,6 @@ void createBlinks(int * current_guess, int * right_answer, int * current_lit, in
         *current_blink = 0xe0;
     else if (temp2 == 4)
         *current_blink = 0xf0;
-    //*current_lit    = 11;
-    //*current_blink  = 10;
 }
 
 void mastermind(void)
@@ -392,18 +350,19 @@ void mastermind(void)
 
     int rightAnswer [4];
 
-    //int past_guesses [MAX_GUESSES][4];
-    //int past_answer  [MAX_GUESSES][2]; // Given past_answer[i][0] = LIT, past_answer[i][1] = BLINKING
+    int past_guesses [MAX_GUESSES][4];
+    int past_answer  [MAX_GUESSES][2]; // Given past_answer[i][0] = LIT, past_answer[i][1] = BLINKING
     int currentLit = 0;
     int currentBlink = 0;
-    int dataArray[7];
+    int dataArray[8];
+    int past_guess_nr = 0;
     reset(dataArray, &symbol_index, current_guess, &guess_nr, rightAnswer,sizeof(dataArray) / sizeof(int));
     while(TRUE){
         if(1 < timeoutcount){ // LED SKA LYSA
-            bintick(currentLit);
+            led_display(currentLit);
         
         }else{              // LED SKA INTE LYSA
-            bintick(currentBlink);
+            led_display(currentBlink);
         
         }
 
@@ -418,15 +377,34 @@ void mastermind(void)
                 }else{
                     dataArray[UPDATE_SCREEN] = WRONG_SCREEN;
                     createBlinks(current_guess, rightAnswer, &currentLit, &currentBlink);
+                    past_answer[guess_nr - 1][0] = currentLit;
+                    past_answer[guess_nr - 1][1] = currentBlink;
                 }
     
             }
+            if(dataArray[GOTO_MAP]){
+                if(dataArray[GOTO_MAP] < guess_nr){
+                    dataArray[UPDATE_SCREEN] = PAST_GUESS;
+                    past_guess_nr = dataArray[GOTO_MAP];
+                    currentLit      = past_answer[past_guess_nr - 1][0];
+                    currentBlink    = past_answer[past_guess_nr - 1][1];
+
+                }else{
+                    dataArray[UPDATE_SCREEN] = INVALID_SCREEN;
+                    dataArray[REMOVE_BLINKS] = TRUE;
+                }
+                dataArray[GOTO_MAP] = 0;
+            }
+
+
             if(dataArray[REMOVE_BLINKS] == TRUE ){
                 currentLit = 0;
                 currentBlink = 0;
 
             }
             if(dataArray[ITER_INCREASE] == TRUE){
+                //past_guesses[guess_nr - 1] = 5;/current_guess; 
+                copyArray(current_guess, past_guesses[guess_nr - 1], 4);
                 guess_nr++;
                 if(guess_nr > MAX_GUESSES){
                     dataArray[UPDATE_SCREEN] = LOSE_SCREEN;
@@ -458,10 +436,12 @@ void mastermind(void)
 
             }
             if(dataArray[UPDATE_SCREEN] != -1){
-                currentScreen = dataArray[UPDATE_SCREEN];
+               if(currentScreen == START_SCREEN && dataArray[UPDATE_SCREEN] == GUESS_SCREEN)
+                    generateSequence(rightAnswer, 4, 0, 6, randomSeed);
+               currentScreen = dataArray[UPDATE_SCREEN];
             
             }
-            updateScreen(currentScreen, guess_nr, current_guess, symbol_index, rightAnswer);
+            updateScreen(currentScreen, guess_nr, current_guess, symbol_index, rightAnswer, past_guesses[past_guess_nr - 1], past_guess_nr);
             zeroInit(dataArray, sizeof(dataArray) / sizeof(int));;
             dataArray[UPDATE_SCREEN] = -1;
             timeoutcount = 0;
